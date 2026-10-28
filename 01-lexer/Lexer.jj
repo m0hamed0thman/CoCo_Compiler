@@ -1,0 +1,122 @@
+/* معمل ٠١ — الـ lexer.  ناقص ٦ حاجات، كل واحدة متعلّمة  ← ١ ... ← ٦ */
+
+options { STATIC = false; }
+
+PARSER_BEGIN(Lexer)
+public class Lexer {
+    public static void main(String[] args) throws Exception {
+        if (args.length == 0) { System.out.println("usage:  java Lexer <file>"); return; }
+        Lexer lx = new Lexer(new java.io.FileInputStream(args[0]));
+        int n = 0;
+        for (Token t = lx.getNextToken(); t.kind != EOF; t = lx.getNextToken()) {
+            System.out.println(String.format("%-20s %s",
+                tokenImage[t.kind].replace("\"", ""), t.image));
+            n++;
+        }
+        System.out.println("---- " + n + " tokens ----");
+    }
+}
+PARSER_END(Lexer)
+
+
+/* ← ١ */
+SKIP : {
+    " "
+|   "\t"
+|   "\n"
+|   "\r"
+|   "\f"
+}
+
+
+/* keywords */
+TOKEN : {
+    < INT:     "int" >
+|   < IF:      "if" >
+|   < PRINTLN: "System.out.println" >
+
+|   < FLOAT:   "float" >
+|   < DOUBLE:  "double" >
+|   < CHAR:    "char" >
+|   < BOOLEAN: "boolean" >
+|   < STRING:  "String" >
+|   < VOID:    "void" >
+|   < ELSE:    "else" >
+|   < FOR:     "for" >
+|   < WHILE:   "while" >
+|   < DO:      "do" >
+|   < RETURN:  "return" >
+|   < CLASS:   "class" >
+|   < NEW:     "new" >
+|   < TRUE:    "true" >
+|   < FALSE:   "false" >
+|   < PUBLIC:  "public" >
+|   < STATIC:  "static" >
+
+}
+
+
+/* identifiers */
+TOKEN : {
+    < #LETTER: ["a"-"z","A"-"Z","_"] >
+|   < #DIGIT:  ["0"-"9"] >
+|   < IDENTIFIER: <LETTER> (<LETTER> | <DIGIT>)* >
+}
+
+
+/* numeric constants */
+TOKEN : {
+   < NUMBER: (<DIGIT>)+ ( "." (<DIGIT>)+ )? ( ["e","E"] (["+","-"])? (<DIGIT>)+ )? >
+}
+
+
+/* string constants */
+TOKEN : {
+    < STRING_LITERAL: "\"" ( ~["\"","\\","\n","\r"] | "\\" ~[] )* "\"" >
+}
+
+
+/* special characters */
+TOKEN : {
+    < SEMICOLON: ";" >
+|   < COMMA:     "," >
+|   < DOT:       "." >
+|   < COLON:     ":" >
+|   < LEFT_PAREN:  "(" >
+|   < RIGHT_PAREN: ")" >
+|   < LEFT_BRACE:  "{" >
+|   < RIGHT_BRACE: "}" >
+}
+
+
+/* operators */
+TOKEN : {
+    < ASSIGN:    "=" >
+|   < PLUS:      "+" >
+|   < MINUS:     "-" >
+|   < ASTERISK:  "*" >
+|   < SLASH:     "/" >
+
+|   < INCREMENT:    "++" >
+|   < DECREMENT:    "--" >
+|   < PLUS_ASSIGN:  "+=" >
+|   < MINUS_ASSIGN: "-=" >
+|   < MUL_ASSIGN:   "*=" >
+|   < DIV_ASSIGN:   "/=" >
+|   < EQ:  "==" >
+|   < NEQ: "!=" >
+|   < LT:  "<" >
+|   < GT:  ">" >
+|   < LE:  "<=" >
+|   < GE:  ">=" >
+|   < AND: "&&" >
+|   < OR:  "||" >
+|   < NOT: "!" >
+
+}
+
+
+TOKEN : {
+    < SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+|   < MULTI_LINE_COMMENT:  "/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/" >
+}
